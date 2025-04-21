@@ -32,6 +32,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -54,6 +56,13 @@ public class View extends HttpServlet {
 
         response.setContentType("text/html;charset=UTF-8");
 
+        Path pathQC = Paths.get("//euh/ehc/apps/prd-sectraPathology/data/Scanners.qc_pending" + request.getPathInfo());
+        Path pathRejected = Paths.get("//euh/ehc/apps/prd-sectraPathology/data/Scanners.qc_rejected" + request.getPathInfo());
+        Path path = null;
+        if(Files.exists(pathQC)) { path = pathQC; }
+        else if(Files.exists(pathRejected)) { path = pathRejected; }
+        else throw new ServletException("file does not exist");
+        
         SVSFile[] svsFileCache = (SVSFile[])request.getSession().getAttribute("svsFileCache");
         Integer index = (Integer)request.getSession().getAttribute("index");
         if(svsFileCache ==  null || index == null) {
@@ -70,7 +79,7 @@ public class View extends HttpServlet {
         if(svsFile != null && svsFile.fc != null && svsFile.fc.isOpen()) {
             svsFile.fc.close();
         }
-        svsFile = new SVSFile(FileChannel.open(Paths.get("//euh/ehc/apps/prd-sectraPathology/data/Scanners.qc_pending" + request.getPathInfo())));
+        svsFile = new SVSFile(FileChannel.open(path));
         svsFile.name = request.getPathInfo();
         svsFileCache[index] = svsFile;
         
