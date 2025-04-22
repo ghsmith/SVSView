@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,8 +59,8 @@ public class View extends HttpServlet {
         Path pathQC = Paths.get("//euh/ehc/apps/prd-sectraPathology/data/Scanners.qc_pending" + request.getPathInfo());
         Path pathRejected = Paths.get("//euh/ehc/apps/prd-sectraPathology/data/Scanners.qc_rejected" + request.getPathInfo());
         Path path = null;
-        if(Files.exists(pathQC)) { path = pathQC; }
-        else if(Files.exists(pathRejected)) { path = pathRejected; }
+        if(Files.exists(pathQC) && !Files.isDirectory(pathQC)) { path = pathQC; }
+        else if(Files.exists(pathRejected) && !Files.isDirectory(pathRejected)) { path = pathRejected; }
         else throw new ServletException("file does not exist");
         
         SVSFile[] svsFileCache = (SVSFile[])request.getSession().getAttribute("svsFileCache");
@@ -76,11 +75,7 @@ public class View extends HttpServlet {
         request.getSession().setAttribute("svsFileCache", svsFileCache);
         request.getSession().setAttribute("index", index);
         
-        SVSFile svsFile = svsFileCache[index];
-        if(svsFile != null && svsFile.fc != null && svsFile.fc.isOpen()) {
-            svsFile.fc.close();
-        }
-        svsFile = new SVSFile(FileChannel.open(path));
+        SVSFile svsFile = new SVSFile(path);
         svsFile.name = request.getPathInfo();
         svsFileCache[index] = svsFile;
         

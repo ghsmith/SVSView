@@ -101,7 +101,7 @@ public class GetTile extends HttpServlet {
                                 Tile tile = svsFile.tileMap.get(String.format("%s.%s.%s", tiffDir, (x * 2) + xd, (y * 2) + yd));
                                 Image image;
                                 if(tile != null) {
-                                    image = ImageIO.read(new ByteArrayInputStream(svsFile.getBytes(tile.offsetInSVS, tile.offsetInSVS + tile.length))).getScaledInstance(128, 128, Image.SCALE_DEFAULT);
+                                    image = ImageIO.read(new ByteArrayInputStream(svsFile.getBytes(tile.offsetInSVS, tile.offsetInSVS + tile.length))).getScaledInstance(128, 128, Image.SCALE_FAST);
                                 }
                                 else {
                                     image = noTile;

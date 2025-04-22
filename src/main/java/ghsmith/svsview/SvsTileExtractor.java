@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardOpenOption.READ;
 import javax.imageio.ImageIO;
@@ -21,14 +22,14 @@ public class SvsTileExtractor {
 
 //        try (FileChannel fc = FileChannel.open(Paths.get("c:\\stuff\\3_17_S25-05277-A1-5_145124_L5.svs"), READ)) {
 //          try(FileChannel fc = FileChannel.open(Paths.get("\\\\euh\\ehc\\apps\\prd-sectraPathology\\data\\Scanners.not_for_pacs\\GT450_EUH_SS12284\\2025-04-15\\S25-09346-A1-4.svs"), READ)) {
-          try(FileChannel fc = FileChannel.open(Paths.get("c:\\stuff\\S25-09346-A1-4.svs"), READ)) {
-            SVSFile svsFile = new SVSFile(fc);
-            svsFile.resetBuffer(1000000);
+            Path path = Paths.get("\\\\euh\\ehc\\apps\\prd-sectraPathology\\data\\Scanners.not_for_pacs\\GT450DX_EUH_SS35007\\2025-02-25\\3_2_S25-05981-A1-4_074039.svs");
+            SVSFile svsFile = new SVSFile(path);//new SVSFile(fc);
+//            svsFile.resetBuffer(1000000);
             for(TIFFDir td : svsFile.tiffDirList) {
                 System.out.println(td.id + ": " + td.mpp + "/" + td.widthInTiles + "/" + td.heightInTiles);
             }
             for(String x : svsFile.tileMap.keySet()) {
-                if(x.startsWith("4.")) {
+                if(x.startsWith("3.")) {
                     Tile t = svsFile.tileMap.get(x);
                     System.out.println(x + ": " + t.offsetInSVS + "/" + t.length + "/" + t.indexInSVS + "/" + t.indexInTiffDir);
                 }
@@ -85,5 +86,5 @@ public class SvsTileExtractor {
             
         }
         
-    }
+    //}
 }

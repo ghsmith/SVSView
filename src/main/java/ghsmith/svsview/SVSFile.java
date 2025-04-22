@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import static java.nio.file.StandardOpenOption.READ;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +53,8 @@ public class SVSFile {
 
     public int BUFFER_SIZE = 5000000;
 
-    public FileChannel fc = null;
+    //public FileChannel fc = null;
+    public Path svsPath = null;
     public long bufferOffset = -1;
     public ByteBuffer bb = ByteBuffer.allocate(BUFFER_SIZE);
     byte[] buffer = null;
@@ -75,15 +78,15 @@ public class SVSFile {
         return longLength;
     }
     
-    public SVSFile(FileChannel svsFile) throws IOException {
-        fc = svsFile;
+    public SVSFile(Path svsPath) throws IOException {
+        this.svsPath = svsPath;
         // is this really a GT450 SVS file?
-        {
-            if(svsFile.size() < 8) { throw new IOException("not a GT450 SVS file (<8 bytes)"); }
-            byte[] gt450TiffHeader = new byte[] { 0x49, 0x49, 0x2b, 0x00, 0x08, 0x00, 0x00, 0x00 };
-            byte[] thisTiffHeader = getBytes(0, 8);
-            if(!Arrays.equals(gt450TiffHeader, thisTiffHeader)) { throw new IOException("not a GT450 SVS file (bad header)"); }
-        }
+        //{
+        //    if(svsFile.size() < 8) { throw new IOException("not a GT450 SVS file (<8 bytes)"); }
+        //    byte[] gt450TiffHeader = new byte[] { 0x49, 0x49, 0x2b, 0x00, 0x08, 0x00, 0x00, 0x00 };
+        //    byte[] thisTiffHeader = getBytes(0, 8);
+        //    if(!Arrays.equals(gt450TiffHeader, thisTiffHeader)) { throw new IOException("not a GT450 SVS file (bad header)"); }
+        //}
         long offset = getBytesAsLong(FIRST_TIFF_DIRECTORY_OFFSET);
         int x = 0;
         while(offset != NO_MORE_TIFF_DIRECTORIES_OFFSET) {
@@ -114,11 +117,13 @@ public class SVSFile {
             ((Buffer)bb).clear();
             int read = 0;
             int readAlready = 0;
-            do {
-                readAlready += read;
-                read = fc.read(bb, indexStart + readAlready);
-                logger.log(Level.SEVERE, String.format("read %s bytes from file channel", read));
-            } while(read > 0 && bb.hasRemaining());
+            try(FileChannel fc = FileChannel.open(svsPath, READ)) {
+                do {
+                    readAlready += read;
+                    read = fc.read(bb, indexStart + readAlready);
+                    logger.log(Level.SEVERE, String.format("read %s bytes from file channel", read));
+                } while(read > 0 && bb.hasRemaining());
+            }
             buffer = bb.array();
         }
     }
