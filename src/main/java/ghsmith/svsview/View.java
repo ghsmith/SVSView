@@ -107,6 +107,7 @@ public class View extends HttpServlet {
             out.println(              "  var viewer = OpenSeadragon({");
             out.println(              "    id: 'tiles',");
             out.println(              "    showNavigationControl: false,");
+            out.println(              "    showNavigator: true,");
             out.println(              "    tileSources: {");
             out.println(String.format("      width:  %s*256,", width));
             out.println(String.format("      height: %s*256,", height));
