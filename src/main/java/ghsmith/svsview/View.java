@@ -31,6 +31,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,10 +99,13 @@ public class View extends HttpServlet {
             out.println("<script src='https://cdnjs.cloudflare.com/ajax/libs/openseadragon/5.0.1/openseadragon.min.js' integrity='sha512-gPZzE+sKmE0kvcjMxW431ef5b5T5QOADV9Gij0isPw2oLATd1IZW7dmDmKh7F2e5BfwjQyAfFp3/OF0fVMOF7Q==' crossorigin='anonymous' referrerpolicy='no-referrer'></script>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<div id='view'></div>");
+            out.println(              "<div id='tiles'></div>");
+            out.println(String.format("<div style='position: absolute; left: 0px; top: 0px; border: 1px solid black;'><img src='https://d76kt52.device.eushc.org:8443/dp/GetLabelImage?leicaName=%s' height='150'/><img src='https://d76kt52.device.eushc.org:8443/dp/GetMacroImage?leicaName=%s' height='150'/></div>",
+                URLEncoder.encode(request.getPathInfo().replace("/", "\\").substring(1)),
+                URLEncoder.encode(request.getPathInfo().replace("/", "\\").substring(1))));
             out.println(              "<script>");
             out.println(              "  var viewer = OpenSeadragon({");
-            out.println(              "    id: 'view',");
+            out.println(              "    id: 'tiles',");
             out.println(              "    showNavigationControl: false,");
             out.println(              "    tileSources: {");
             out.println(String.format("      width:  %s*256,", width));
